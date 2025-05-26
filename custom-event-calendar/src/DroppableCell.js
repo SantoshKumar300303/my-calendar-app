@@ -1,5 +1,6 @@
 import React from 'react';
 import { format, isSameDay } from 'date-fns';
+import { isEventOnDate } from './RecurringEventUtils';
 
 export default function DroppableCell({
   day,
@@ -13,8 +14,7 @@ export default function DroppableCell({
 
   // Filter events on this day
   const dayEvents = events.filter(event => {
-    const eventDate = new Date(event.date + 'T00:00:00');
-    return isSameDay(eventDate, day);
+    return isEventOnDate(event, day);
   });
 
   // Allow drop by preventing default
@@ -25,9 +25,13 @@ export default function DroppableCell({
   // Handle drop - update event date
   const handleDrop = (e) => {
     e.preventDefault();
-    const eventId = e.dataTransfer.getData('text/plain');
-    if (eventId) {
-      onEventDrop(eventId, day);
+
+    const eventId = e.dataTransfer.getData('text/plain');          // event ID
+    const originalDateStr = e.dataTransfer.getData('event-date');  // original date string in 'yyyy-MM-dd'
+
+    if (eventId && originalDateStr) {
+      const originalDate = new Date(originalDateStr);
+      onEventDrop(eventId, day, originalDate);
     }
   };
 
@@ -43,10 +47,11 @@ export default function DroppableCell({
 
       {dayEvents.map(event => (
         <div
-          key={event.id}
+          key={`${event.id}-${format(day, 'yyyy-MM-dd')}`}
           draggable
           onDragStart={(e) => {
             e.dataTransfer.setData('text/plain', event.id);
+            e.dataTransfer.setData('event-date', format(day, 'yyyy-MM-dd'));
           }}
           style={{
             backgroundColor: event.color,

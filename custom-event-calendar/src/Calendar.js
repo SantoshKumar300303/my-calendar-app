@@ -40,23 +40,31 @@ function Calendar({ events, setEvents }) {
     setFormData(event);
   };
 
-  const handleEventDrop = (eventId, newDate) => {
+  const handleEventDrop = (eventId, newDate, originalDate) => {
     const newDateStr = format(newDate, 'yyyy-MM-dd');
-    const eventToMove = events.find(ev => ev.id === Number(eventId));
-    if (!eventToMove) return;
 
-    const updatedEvent = { ...eventToMove, date: newDateStr };
-
-    if (hasConflict(updatedEvent)) {
-      alert('Cannot move event. Conflict with another event at the same date and time.');
-      return;
-    }
-
-    setEvents(events.map(ev =>
-      ev.id === Number(eventId)
-        ? updatedEvent
-        : ev
-    ));
+    setEvents(prevEvents => {
+      return prevEvents.map(event => {
+        if (event.id === Number(eventId)) {
+          if (event.recurrence === 'None') {
+            // Non-recurring event: update date directly
+            return { ...event, date: newDateStr };
+          }
+          // Recurring event: create a new one-time event instance at newDate
+          return [
+            event,
+            {
+              ...event,
+              id: Date.now(),
+              date: newDateStr,
+              recurrence: 'None',
+              title: `${event.title} (moved instance)`,
+            },
+          ];
+        }
+        return event;
+      }).flat();
+    });
   };
 
   const renderHeader = () => {
@@ -154,6 +162,7 @@ function Calendar({ events, setEvents }) {
               ...event,
               date: format(new Date(event.date), 'yyyy-MM-dd'),
               id: event.id ? event.id : Date.now(),
+              recurrence: event.recurrence || 'None',
             };
 
             if (hasConflict(eventWithId)) {
