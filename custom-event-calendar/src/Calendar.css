@@ -1,0 +1,74 @@
+.calendar {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.header, .days {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.body {
+  display: block; /* stack weeks vertically */
+  margin-bottom: 10px;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.col {
+  flex: 1;
+  border: 1px solid #ddd;
+  padding: 8px;
+  box-sizing: border-box;
+  min-height: 80px;
+  position: relative;
+  cursor: pointer;
+}
+
+.col.disabled {
+  background-color: #f9f9f9;
+  color: #bbb;
+  cursor: default;
+}
+
+.col.selected {
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+}
+
+.number {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.event {
+  background-color: #3174ad;
+  color: white;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header .col {
+  cursor: default;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.days .col {
+  font-weight: bold;
+  text-align: center;
+}
